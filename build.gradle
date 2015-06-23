@@ -1,0 +1,70 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:1.2.1.RELEASE')
+    }
+}
+
+
+apply plugin: 'war'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+
+ext {
+    javaVersion='1.8'
+}
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+buildDir = 'build'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //thymeleaf
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf:1.2.1.RELEASE")
+    //jsp config
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-tomcat")
+    // compile("org.apache.tomcat.embed:tomcat-embed-jasper")
+    //compile("javax.servlet:jstl")
+
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("com.h2database:h2")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    //util
+    compile 'net.sourceforge.nekohtml:nekohtml:1.9.22'
+
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+task initSrc << {
+    project.sourceSets*.allSource.srcDirTrees.flatten().dir.each { dir ->
+        dir.mkdirs()
+    }
+}
+
+
+
+// 소스 인코딩 지정방법 1
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+
+/* Eclipse 관련 설정들 */
+tasks.eclipse.dependsOn cleanEclipse
+tasks.eclipse.dependsOn initSrc
+
+tasks.idea.dependsOn initSrc
+
+eclipse {
+    classpath {
+        downloadSources = true
+        defaultOutputDir = file("${buildDir}/classes/main")
+    }
+}
